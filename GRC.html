@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GRC Incident Report — Rockstar Games Breach 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #0f1218;
+    --surface2: #151a22;
+    --border: #1e2530;
+    --accent: #e63946;
+    --accent2: #ff9f1c;
+    --accent3: #2ec4b6;
+    --text: #d4dbe8;
+    --text-muted: #6b7a8d;
+    --text-bright: #f0f4ff;
+    --high: #e63946;
+    --medium: #ff9f1c;
+    --low: #2ec4b6;
+    --critical: #ff2d55;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  /* Scanline overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.04) 2px,
+      rgba(0,0,0,0.04) 4px
+    );
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* HEADER */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 40px 0 32px;
+    margin-bottom: 48px;
+    position: relative;
+  }
+
+  .classification {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .classification::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 800;
+    color: var(--text-bright);
+    line-height: 1.05;
+    letter-spacing: -1px;
+    margin-bottom: 16px;
+  }
+
+  h1 span {
+    color: var(--accent);
+  }
+
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-top: 20px;
+  }
+
+  .meta-item {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+  }
+
+  .meta-item strong {
+    color: var(--text);
+  }
+
+  /* ALERT BANNER */
+  .alert-banner {
+    background: linear-gradient(135deg, rgba(230,57,70,0.12), rgba(230,57,70,0.05));
+    border: 1px solid rgba(230,57,70,0.3);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin-bottom: 40px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--text);
+  }
+
+  .alert-banner .label {
+    color: var(--accent);
+    font-weight: 700;
+    letter-spacing: 2px;
+    font-size: 10px;
+    margin-bottom: 6px;
+  }
+
+  /* SECTION */
+  section {
+    margin-bottom: 48px;
+    animation: fadeIn 0.5s ease forwards;
+    opacity: 0;
+  }
+
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+
+  section:nth-child(1) { animation-delay: 0.05s; }
+  section:nth-child(2) { animation-delay: 0.1s; }
+  section:nth-child(3) { animation-delay: 0.15s; }
+  section:nth-child(4) { animation-delay: 0.2s; }
+  section:nth-child(5) { animation-delay: 0.25s; }
+  section:nth-child(6) { animation-delay: 0.3s; }
+  section:nth-child(7) { animation-delay: 0.35s; }
+  section:nth-child(8) { animation-delay: 0.4s; }
+  section:nth-child(9) { animation-delay: 0.45s; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border: 1px solid rgba(230,57,70,0.3);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-bright);
+    letter-spacing: 0.3px;
+  }
+
+  h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent3);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin: 20px 0 10px;
+  }
+
+  p {
+    color: var(--text);
+    margin-bottom: 12px;
+    max-width: 72ch;
+  }
+
+  strong {
+    color: var(--text-bright);
+    font-weight: 500;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px 24px;
+    margin-bottom: 12px;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover {
+    border-color: rgba(46, 196, 182, 0.25);
+  }
+
+  /* RISK TABLE */
+  .risk-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 13px;
+  }
+
+  .risk-table th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .risk-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  .risk-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .risk-table tr:hover td {
+    background: rgba(255,255,255,0.02);
+  }
+
+  /* BADGES */
+  .badge {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    padding: 3px 10px;
+    border-radius: 2px;
+    text-transform: uppercase;
+  }
+
+  .badge-high { background: rgba(230,57,70,0.15); color: var(--high); border: 1px solid rgba(230,57,70,0.3); }
+  .badge-critical { background: rgba(255,45,85,0.15); color: var(--critical); border: 1px solid rgba(255,45,85,0.3); }
+  .badge-medium { background: rgba(255,159,28,0.12); color: var(--medium); border: 1px solid rgba(255,159,28,0.3); }
+  .badge-low { background: rgba(46,196,182,0.12); color: var(--low); border: 1px solid rgba(46,196,182,0.3); }
+  .badge-info { background: rgba(100,150,255,0.1); color: #7eb3ff; border: 1px solid rgba(100,150,255,0.25); }
+
+  /* ATTACK CHAIN */
+  .attack-chain {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    margin: 16px 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+  }
+
+  .chain-step {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 10px 16px;
+    position: relative;
+    flex: 1;
+    min-width: 120px;
+    text-align: center;
+  }
+
+  .chain-step .step-num {
+    display: block;
+    color: var(--accent);
+    font-size: 9px;
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+  }
+
+  .chain-step .step-label {
+    color: var(--text-bright);
+    font-weight: 600;
+    font-size: 11px;
+  }
+
+  .chain-step .step-desc {
+    color: var(--text-muted);
+    font-size: 9px;
+    display: block;
+    margin-top: 3px;
+  }
+
+  .chain-step:not(:last-child)::after {
+    content: '→';
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--accent);
+    font-size: 14px;
+    z-index: 1;
+  }
+
+  /* MITRE TABLE */
+  .mitre-item {
+    display: flex;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+  }
+
+  .mitre-item:last-child { border-bottom: none; }
+
+  .mitre-id {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--accent2);
+    font-weight: 600;
+    min-width: 110px;
+    flex-shrink: 0;
+  }
+
+  .mitre-desc {
+    font-size: 13px;
+  }
+
+  .mitre-desc strong {
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  /* COMPLIANCE GRID */
+  .compliance-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .compliance-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 2px solid;
+    border-radius: 4px;
+    padding: 18px;
+  }
+
+  .compliance-card.gdpr { border-top-color: var(--accent); }
+  .compliance-card.iso { border-top-color: var(--accent2); }
+  .compliance-card.soc2 { border-top-color: var(--accent3); }
+
+  .compliance-card .framework-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+
+  .compliance-card.gdpr .framework-label { color: var(--accent); }
+  .compliance-card.iso .framework-label { color: var(--accent2); }
+  .compliance-card.soc2 .framework-label { color: var(--accent3); }
+
+  .compliance-card ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .compliance-card ul li {
+    font-size: 12px;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .compliance-card ul li:last-child { border-bottom: none; }
+  .compliance-card ul li::before { content: '↳'; color: var(--text-muted); flex-shrink: 0; }
+
+  /* RECOMMENDATIONS */
+  .rec-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--accent3);
+    border-radius: 4px;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    font-size: 13px;
+  }
+
+  .rec-item .rec-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    color: var(--text-bright);
+    margin-bottom: 4px;
+    font-size: 13px;
+  }
+
+  /* OWASP */
+  .owasp-item {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: start;
+  }
+
+  .owasp-item:last-child { border-bottom: none; }
+
+  .owasp-rank {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    color: rgba(230,57,70,0.25);
+    line-height: 1;
+  }
+
+  .owasp-rank span {
+    display: block;
+    font-size: 9px;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    font-weight: 400;
+    margin-top: 2px;
+  }
+
+  /* LESSONS */
+  .lesson-item {
+    display: flex;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+  }
+
+  .lesson-item:last-child { border-bottom: none; }
+
+  .lesson-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 24px;
+    font-weight: 700;
+    color: rgba(46,196,182,0.2);
+    min-width: 40px;
+    line-height: 1;
+    padding-top: 2px;
+  }
+
+  /* CTA */
+  .cta-block {
+    background: linear-gradient(135deg, rgba(46,196,182,0.08), rgba(46,196,182,0.03));
+    border: 1px solid rgba(46,196,182,0.25);
+    border-radius: 6px;
+    padding: 28px 32px;
+    margin-top: 48px;
+    text-align: center;
+  }
+
+  .cta-block h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text-bright);
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--accent3);
+    margin-bottom: 10px;
+  }
+
+  .cta-block p {
+    max-width: 60ch;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  /* FOOTER */
+  footer {
+    margin-top: 60px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+  }
+
+  /* Utilities */
+  .mono { font-family: 'IBM Plex Mono', monospace; }
+  .dim { color: var(--text-muted); }
+  .code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    background: var(--surface2);
+    padding: 2px 6px;
+    border-radius: 2px;
+    color: var(--accent3);
+  }
+
+  hr.subtle {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 20px 0;
+  }
+
+  @media (max-width: 600px) {
+    .attack-chain { flex-direction: column; }
+    .chain-step:not(:last-child)::after { content: '↓'; right: auto; left: 50%; top: auto; bottom: -12px; transform: none; }
+    .owasp-item { grid-template-columns: 1fr; }
+    .mitre-item { flex-direction: column; gap: 4px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="classification">● CONFIDENTIAL — GRC INCIDENT INTELLIGENCE REPORT</div>
+    <h1>Rockstar Games<br><span>Supply Chain Breach</span></h1>
+    <p style="font-size:13px; color:var(--text-muted); max-width:60ch; margin-top:10px;">
+      A comprehensive Governance, Risk &amp; Compliance analysis of the April 2026 ShinyHunters intrusion via the Anodot → Snowflake attack chain.
+    </p>
+    <div class="meta-row">
+      <div class="meta-item">DATE <strong>April 14, 2026</strong></div>
+      <div class="meta-item">THREAT ACTOR <strong>ShinyHunters</strong></div>
+      <div class="meta-item">VECTOR <strong>SaaS Supply Chain</strong></div>
+      <div class="meta-item">SEVERITY <strong style="color:var(--accent)">HIGH</strong></div>
+      <div class="meta-item">AUTHOR <strong>GRC Intelligence Unit</strong></div>
+    </div>
+  </header>
+
+  <div class="alert-banner">
+    <div class="label">⚠ Active Threat Notice</div>
+    ShinyHunters confirmed data release after Rockstar declined to pay a $200,000 ransom. Initial leaked data appears scoped to GTA Online and Red Dead Online operational analytics. No confirmed player PII at time of publication. Situation remains fluid.
+  </div>
+
+  <!-- 1. EXECUTIVE SUMMARY -->
+  <section>
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2>Executive Summary</h2>
+    </div>
+
+    <p>On <strong>April 11, 2026</strong>, the financially motivated threat group <strong>ShinyHunters</strong> publicly claimed intrusion into Rockstar Games' Snowflake cloud data warehouse environment — not by breaching Snowflake directly, but by exploiting <strong>Anodot</strong>, a third-party SaaS platform Rockstar uses for cloud cost monitoring and anomaly analytics. Anodot (owned by Glassbox) suffered its own breach, from which attackers extracted OAuth/API authentication tokens that granted valid, trusted access to connected customer Snowflake environments.</p>
+
+    <p>The attackers issued a ransom demand with an April 14 deadline ("Pay or leak") and followed through on the threat when Rockstar declined. Rockstar publicly confirmed "a limited amount of non-material company information" was accessed with "no impact on our organisation or our players." Early leaked data appears limited to GTA Online and Red Dead Online analytics — no player PII, no GTA VI development assets confirmed.</p>
+
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap:12px; margin-top:20px;">
+      <div class="card" style="border-top:2px solid var(--accent);">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:2px; color:var(--text-muted); margin-bottom:8px;">DATA IMPACT</div>
+        <div style="font-size:13px; color:var(--text-bright);">Corporate operational data. No confirmed player PII or GTA VI assets.</div>
+      </div>
+      <div class="card" style="border-top:2px solid var(--medium);">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:2px; color:var(--text-muted); margin-bottom:8px;">REPUTATIONAL RISK</div>
+        <div style="font-size:13px; color:var(--text-bright);">Second major incident in 4 years. Erodes investor and community trust ahead of GTA VI (Nov 2026).</div>
+      </div>
+      <div class="card" style="border-top:2px solid var(--accent3);">
+        <div style="font-family:'IBM Plex Mono',monospace; font-size:9px; letter-spacing:2px; color:var(--text-muted); margin-bottom:8px;">OPERATIONAL IMPACT</div>
+        <div style="font-size:13px; color:var(--text-bright);">Anodot connectors down across all regions (Snowflake, S3, Kinesis) as of April 4.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. GOVERNANCE FAILURES -->
+  <section>
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2>Governance Failures</h2>
+    </div>
+
+    <h3>Third-Party Risk Management (TPRM)</h3>
+    <p>The root failure is not a Rockstar systems failure — it is a <strong>vendor governance failure</strong>. Rockstar granted Anodot privileged access to its Snowflake environment for cloud cost monitoring. Standard TPRM practice requires continuous security posture assessment of vendors with privileged data access, not just point-in-time audit checks. There is no public evidence Rockstar conducted ongoing token hygiene reviews or imposed least-privilege scoping on Anodot's integration credentials.</p>
+
+    <h3>Excessive Permission Scope</h3>
+    <p>Anodot required read access to cloud spending metrics. It reportedly held tokens with access to Rockstar's broader Snowflake environment — a clear violation of the <strong>principle of least privilege</strong>. The blast radius of the Anodot compromise was determined entirely by the permission scope granted at integration onboarding.</p>
+
+    <h3>Pattern of Repeated Incidents</h3>
+    <p>This is Rockstar's <strong>second major breach in four years</strong>. The 2022 breach (Lapsus$ teenager via Slack) and the 2026 breach (ShinyHunters via SaaS supply chain) both point to systemic governance gaps: insufficient third-party access controls, weak identity hygiene, and a security culture that has not course-corrected between incidents. Leadership accountability is a critical open question.</p>
+
+    <h3>Security Leadership Gap</h3>
+    <p>There is no public record of Rockstar Games having a visible, empowered CISO with board-level mandate. Take Two Interactive (Rockstar's parent) must mandate security governance at the subsidiary level with measurable compliance requirements tied to vendor onboarding and integration management.</p>
+  </section>
+
+  <!-- 3. RISK ANALYSIS -->
+  <section>
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2>Risk Analysis</h2>
+    </div>
+
+    <h3>Attack Chain Visualization</h3>
+    <div class="attack-chain">
+      <div class="chain-step">
+        <span class="step-num">STEP 01</span>
+        <div class="step-label">Anodot Breach</div>
+        <span class="step-desc">SaaS integrator compromised; dwell time suspected</span>
+      </div>
+      <div class="chain-step">
+        <span class="step-num">STEP 02</span>
+        <div class="step-label">Token Extraction</div>
+        <span class="step-desc">Auth tokens harvested from Anodot infrastructure</span>
+      </div>
+      <div class="chain-step">
+        <span class="step-num">STEP 03</span>
+        <div class="step-label">Trusted Access</div>
+        <span class="step-desc">Tokens used to impersonate legitimate Anodot connector</span>
+      </div>
+      <div class="chain-step">
+        <span class="step-num">STEP 04</span>
+        <div class="step-label">Snowflake Pivot</div>
+span>        <span class="step-desc">Silent data exfiltration via normal DB operations</span>
+      </div>
+      <div class="chain-step">
+        <span class="step-num">STEP 05</span>
+        <div class="step-label">Extortion</div>
+        <span class="step-desc">"Pay or leak" — $200K ransom, April 14 deadline</span>
+      </div>
+    </div>
+
+    <h3>Risk Register — Framework Mapping</h3>
+    <table class="risk-table">
+      <thead>
+        <tr>
+          <th>Risk</th>
+          <th>Severity</th>
+          <th>NIST RMF Control</th>
+          <th>ISO 27001 Annex A</th>
+          <th>Justification</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>SaaS Supply Chain Compromise</strong></td>
+          <td><span class="badge badge-critical">Critical</span></td>
+          <td class="mono dim" style="font-size:11px;">SR-6, SR-8</td>
+          <td class="mono dim" style="font-size:11px;">A.5.19, A.5.20</td>
+          <td style="font-size:12px;">Root cause. Vendor had excessive, unmonitored access.</td>
+        </tr>
+        <tr>
+          <td><strong>Stolen Authentication Tokens</strong></td>
+          <td><span class="badge badge-high">High</span></td>
+          <td class="mono dim" style="font-size:11px;">IA-5, SC-28</td>
+          <td class="mono dim" style="font-size:11px;">A.5.17, A.8.3</td>
+          <td style="font-size:12px;">Tokens granted unfettered, trusted access — bypassed detection.</td>
+        </tr>
+        <tr>
+          <td><strong>Excessive Privilege (Least Privilege Violation)</strong></td>
+          <td><span class="badge badge-high">High</span></td>
+          <td class="mono dim" style="font-size:11px;">AC-6, AC-2</td>
+          <td class="mono dim" style="font-size:11px;">A.5.15, A.8.2</td>
+          <td style="font-size:12px;">Anodot tokens scoped beyond operational need.</td>
+        </tr>
+        <tr>
+          <td><strong>Lack of Behavioral Anomaly Detection</strong></td>
+          <td><span class="badge badge-high">High</span></td>
+          <td class="mono dim" style="font-size:11px;">SI-4, AU-6</td>
+          <td class="mono dim" style="font-size:11px;">A.8.16</td>
+          <td style="font-size:12px;">Legitimate-looking access meant breach was functionally invisible.</td>
+        </tr>
+        <tr>
+          <td><strong>Inadequate Token Rotation Policy</strong></td>
+          <td><span class="badge badge-medium">Medium</span></td>
+          <td class="mono dim" style="font-size:11px;">IA-5(1), CM-6</td>
+          <td class="mono dim" style="font-size:11px;">A.5.17</td>
+          <td style="font-size:12px;">Static long-lived tokens are a systemic SaaS integration risk.</td>
+        </tr>
+        <tr>
+          <td><strong>Reputational / Pre-Launch Timing Risk</strong></td>
+          <td><span class="badge badge-medium">Medium</span></td>
+          <td class="mono dim" style="font-size:11px;">PM-9</td>
+          <td class="mono dim" style="font-size:11px;">A.5.29</td>
+          <td style="font-size:12px;">GTA VI releases Nov 2026; breach erodes market confidence.</td>
+        </tr>
+        <tr>
+          <td><strong>No Confirmed Player PII Exposure</strong></td>
+          <td><span class="badge badge-low">Low</span></td>
+          <td class="mono dim" style="font-size:11px;">PL-8</td>
+          <td class="mono dim" style="font-size:11px;">A.5.34</td>
+          <td style="font-size:12px;">Current intelligence indicates no PII accessed. Scope may widen.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 4. COMPLIANCE VIOLATIONS -->
+  <section>
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2>Compliance Violations &amp; Control Failures</h2>
+    </div>
+
+    <div class="compliance-grid">
+      <div class="compliance-card gdpr">
+        <div class="framework-label">GDPR</div>
+        <ul>
+          <li>Art. 33 — 72-hr supervisory authority notification duty triggered if any EU player data is confirmed</li>
+          <li>Art. 28 — Inadequate data processor contractual obligations with Anodot (third-party)</li>
+          <li>Art. 25 — Data protection by design; access scoping not applied at integration layer</li>
+          <li>Art. 32 — Insufficient technical security measures (token hygiene, monitoring)</li>
+        </ul>
+      </div>
+      <div class="compliance-card iso">
+        <div class="framework-label">ISO 27001:2022</div>
+        <ul>
+          <li>A.5.19/5.20 — Supplier security policy and contractual requirements missing</li>
+          <li>A.5.23 — Cloud service security governance not enforced for SaaS integrations</li>
+          <li>A.8.2 — Privileged access rights not minimised for third-party connectors</li>
+          <li>A.8.16 — Monitoring activities insufficient to detect lateral movement via trusted tokens</li>
+        </ul>
+      </div>
+      <div class="compliance-card soc2">
+        <div class="framework-label">SOC 2</div>
+        <ul>
+          <li>CC6.1 — Logical and physical access controls not applied to vendor integrations</li>
+          <li>CC6.3 — Access removal/restriction procedures absent for SaaS token lifecycle</li>
+          <li>CC7.2 — System monitoring failed to detect anomalous exfiltration patterns</li>
+          <li>CC9.2 — Vendor risk management program inadequate for SaaS-class integrators</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px; border-left:2px solid var(--accent2);">
+      <strong style="font-size:12px; font-family:'IBM Plex Mono',monospace; letter-spacing:1px;">CCPA / U.S. STATE PRIVACY LAWS</strong>
+      <p style="font-size:12px; margin-top:8px; margin-bottom:0;">If any California resident player data is found in leaked files, Rockstar faces California Consumer Privacy Act (CCPA) exposure and potential FTC scrutiny under Section 5 (Unfair or Deceptive Acts). Rockstar's current public posture — that no player data was accessed — sets the benchmark against which leaked files will be forensically compared.</p>
+    </div>
+  </section>
+
+  <!-- 5. OWASP TOP 10 -->
+  <section>
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h2>OWASP Top 10 Mapping</h2>
+    </div>
+
+    <div class="owasp-item">
+      <div class="owasp-rank">A01<span>OWASP</span></div>
+      <div>
+        <strong>Broken Access Control</strong>
+        <p style="font-size:13px; margin-bottom:0;">Anodot's integration tokens were scoped with far more access than the cloud cost monitoring function required. This is a direct access control misconfiguration — the connector could query data well beyond its operational need. Blast radius = permission scope.</p>
+      </div>
+    </div>
+
+    <div class="owasp-item">
+      <div class="owasp-rank">A02<span>OWASP</span></div>
+      <div>
+        <strong>Cryptographic Failures (Token Security)</strong>
+        <p style="font-size:13px; margin-bottom:0;">Authentication tokens were stored or transmitted in a manner that allowed extraction by ShinyHunters after Anodot was compromised. Lack of token encryption at rest and absent rotation policies constitute cryptographic/secret management failures.</p>
+      </div>
+    </div>
+
+    <div class="owasp-item">
+      <div class="owasp-rank">A05<span>OWASP</span></div>
+      <div>
+        <strong>Security Misconfiguration</strong>
+        <p style="font-size:13px; margin-bottom:0;">The Snowflake environment accessible via Anodot tokens lacked adequate network-layer restrictions (IP allowlisting, VPC endpoint policies) that would have prevented an external actor from using stolen credentials to connect from outside Rockstar's known infrastructure.</p>
+      </div>
+    </div>
+
+    <div class="owasp-item">
+      <div class="owasp-rank">A06<span>OWASP</span></div>
+      <div>
+        <strong>Vulnerable and Outdated Components (SaaS Dependencies)</strong>
+        <p style="font-size:13px; margin-bottom:0;">Modern SaaS supply chain risk is the enterprise-era equivalent of vulnerable third-party libraries. Just as developers must audit npm packages, security teams must continuously audit SaaS integrator security posture. Anodot's breach was a known security event before Rockstar's exposure was announced.</p>
+      </div>
+    </div>
+
+    <div class="owasp-item">
+      <div class="owasp-rank">A09<span>OWASP</span></div>
+      <div>
+        <strong>Security Logging and Monitoring Failures</strong>
+        <p style="font-size:13px; margin-bottom:0;">The breach was "functionally invisible" because the attacker accessed Snowflake using valid, trusted credentials. Absent behavioral analytics capable of distinguishing legitimate Anodot traffic from adversarial usage patterns, detection relied entirely on the attacker self-disclosing via their dark web post.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. TECHNICAL & HUMAN FACTORS -->
+  <section>
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <h2>Technical &amp; Human Factors</h2>
+    </div>
+
+    <h3>Cloud Security Misconfigurations (AWS / Snowflake)</h3>
+    <div class="card">
+      <p style="margin-bottom:8px;"><strong>Token-Based Auth Without Rotation:</strong> Long-lived static tokens in SaaS integrations are the cloud-era equivalent of hardcoded credentials. AWS IAM best practice mandates credential rotation; the same discipline must apply to Snowflake OAuth tokens and API keys granted to third-party platforms.</p>
+      <p style="margin-bottom:8px;"><strong>Absent Network Controls:</strong> Snowflake supports network policies (IP allowlisting) and private connectivity via AWS PrivateLink. If enforced, even a valid stolen token from outside Rockstar's known IP ranges would have been blocked at the network layer.</p>
+      <p style="margin-bottom:0;"><strong>Amazon S3 and Kinesis Exposure:</strong> Anodot connectors were also down across S3 and Amazon Kinesis endpoints, suggesting the token exposure potentially reached beyond Snowflake into AWS data pipeline infrastructure.</p>
+    </div>
+
+    <h3>MITRE ATT&CK Technique Mapping</h3>
+    <div style="margin-top:8px;">
+      <div class="mitre-item">
+        <span class="mitre-id">T1195.003</span>
+        <div class="mitre-desc"><strong>Supply Chain Compromise: Compromise Software Dependencies</strong><span class="dim" style="font-size:12px;">Exploitation of Anodot (trusted SaaS vendor) as the upstream entry point into Rockstar's environment.</span></div>
+      </div>
+      <div class="mitre-item">
+        <span class="mitre-id">T1528</span>
+        <div class="mitre-desc"><strong>Steal Application Access Token</strong><span class="dim" style="font-size:12px;">Extraction of OAuth/API tokens from Anodot infrastructure to gain persistent, trusted access to Snowflake.</span></div>
+      </div>
+      <div class="mitre-item">
+        <span class="mitre-id">T1550.001</span>
+        <div class="mitre-desc"><strong>Use Alternate Authentication Material: Application Access Token</strong><span class="dim" style="font-size:12px;">Using stolen tokens — not stolen passwords — to authenticate as a legitimate service, bypassing MFA and traditional credential controls.</span></div>
+      </div>
+      <div class="mitre-item">
+        <span class="mitre-id">T1567.002</span>
+        <div class="mitre-desc"><strong>Exfiltration to Cloud Storage</strong><span class="dim" style="font-size:12px;">Data exfiltrated via standard Snowflake query operations, mimicking legitimate analytics workloads to evade detection.</span></div>
+      </div>
+      <div class="mitre-item">
+        <span class="mitre-id">T1657</span>
+        <div class="mitre-desc"><strong>Financial Theft / Extortion</strong><span class="dim" style="font-size:12px;">$200,000 ransom demand with public "pay or leak" ultimatum. ShinyHunters' consistent operational model across all confirmed targets.</span></div>
+      </div>
+      <div class="mitre-item">
+        <span class="mitre-id">T1078.004</span>
+        <div class="mitre-desc"><strong>Valid Accounts: Cloud Accounts</strong><span class="dim" style="font-size:12px;">Attacker operated entirely with valid cloud credentials, making traffic indistinguishable from legitimate Anodot service activity.</span></div>
+      </div>
+    </div>
+
+    <h3>Human Factors</h3>
+    <p>ShinyHunters is documented as using <strong>social engineering</strong> — impersonating IT help desk and support personnel — as an initial access tactic against target organizations. While the Anodot breach vector is not yet fully disclosed, the group's documented TTPs include vishing and phishing against SaaS vendor employees. A single compromised Anodot internal account could have been the origin point for the token extraction that enabled the entire campaign.</p>
+  </section>
+
+  <!-- 7. INCIDENT RESPONSE -->
+  <section>
+    <div class="section-header">
+      <span class="section-num">07</span>
+      <h2>Incident Response Evaluation</h2>
+    </div>
+
+    <h3>Detection Gap</h3>
+    <p>Rockstar had <strong>zero endogenous detection</strong>. The breach was announced publicly by the attacker on April 11 — Rockstar learned of the compromise the same way the public did: via a threat actor post on a dark web leak site. The Anodot status page noted connector disruptions on <strong>April 4</strong>, indicating a 7-day window during which active data exfiltration may have been underway without alerting Rockstar's security team.</p>
+
+    <h3>Response Assessment</h3>
+    <table class="risk-table">
+      <thead>
+        <tr>
+          <th>IR Phase</th>
+          <th>Assessment</th>
+          <th>Gap Identified</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Identification</strong></td>
+          <td><span class="badge badge-high">Failed</span></td>
+          <td style="font-size:12px;">External disclosure (attacker) was the detection mechanism</td>
+        </tr>
+        <tr>
+          <td><strong>Containment</strong></td>
+          <td><span class="badge badge-medium">Partial</span></td>
+          <td style="font-size:12px;">Snowflake locked down potentially impacted accounts; Anodot connectors taken offline</td>
+        </tr>
+        <tr>
+          <td><strong>Communication</strong></td>
+          <td><span class="badge badge-medium">Partial</span></td>
+          <td style="font-size:12px;">Rockstar confirmed breach to Kotaku; no formal public advisory or regulatory notification confirmed</td>
+        </tr>
+        <tr>
+          <td><strong>Eradication</strong></td>
+          <td><span class="badge badge-info">Unknown</span></td>
+          <td style="font-size:12px;">No confirmation of full scope assessment or token revocation across connected systems</td>
+        </tr>
+        <tr>
+          <td><strong>Recovery</strong></td>
+          <td><span class="badge badge-info">Ongoing</span></td>
+          <td style="font-size:12px;">Operations unaffected per statement; deeper forensics timeline unknown</td>
+        </tr>
+        <tr>
+          <td><strong>Lessons Learned</strong></td>
+          <td><span class="badge badge-high">Critical Gap</span></td>
+          <td style="font-size:12px;">Second major breach in 4 years with no public evidence of prior incident-driven security hardening</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 8. RECOMMENDATIONS -->
+  <section>
+    <div class="section-header">
+      <span class="section-num">08</span>
+      <h2>Recommendations</h2>
+    </div>
+
+    <h3>Governance</h3>
+    <div class="rec-item">
+      <div class="rec-title">Mandate Continuous TPRM for All SaaS Integrators</div>
+      Implement a tiered vendor risk classification system. Any SaaS vendor with privileged access to production data environments (Snowflake, S3, data warehouses) must undergo quarterly security posture reviews, mandatory breach notification SLAs in contract, and real-time security rating monitoring (e.g., SecurityScorecard, Bitsight).
+    </div>
+    <div class="rec-item">
+      <div class="rec-title">Appoint CISO with Board-Level Mandate</div>
+      Take Two Interactive should require all subsidiaries to maintain a named, empowered CISO with board visibility. Security incidents must trigger board-level reporting within defined SLAs.
+    </div>
+
+    <h3>Risk Mitigation</h3>
+    <div class="rec-item">
+      <div class="rec-title">Enforce Least Privilege on All SaaS Integration Tokens</div>
+      Audit and re-scope every third-party integration token. Anodot needed read access to cost metrics only — not the full Snowflake environment. Implement Snowflake row-level security and database-level grants scoped to the minimum required dataset.
+    </div>
+    <div class="rec-item">
+      <div class="rec-title">Enforce Token Rotation and Short-Lived Credentials</div>
+      Replace long-lived static API tokens with short-lived OAuth 2.0 tokens (max 1hr TTL) for all SaaS integrations. Automate rotation via secrets management platforms (AWS Secrets Manager, HashiCorp Vault). Any unrotated token older than 30 days should trigger an automated alert.
+    </div>
+    <div class="rec-item">
+      <div class="rec-title">Network Policy Enforcement on Snowflake</div>
+      Enable Snowflake Network Policies to allowlist only known Anodot/integration IP ranges. Implement AWS PrivateLink for Snowflake to prevent public internet access entirely. Force MFA on all Snowflake human and service accounts.
+    </div>
+
+    <h3>Detection &amp; AI-Based Threat Intelligence</h3>
+    <div class="rec-item">
+      <div class="rec-title">Deploy Behavioral Analytics (UEBA) for Cloud Data Access</div>
+      Implement User and Entity Behavior Analytics (UEBA) tuned for data warehouse access patterns. Anomalies to flag: queries from unexpected geos, bulk SELECT operations outside business hours, data volumes exceeding baseline thresholds, new connection sources using existing service account credentials. Platforms: Snowflake's own anomaly detection, Securonix, Exabeam, or Microsoft Sentinel.
+    </div>
+    <div class="rec-item">
+      <div class="rec-title">AI-Powered Threat Detection Improvements</div>
+      ShinyHunters was <strong>blocked by AI detection</strong> when they attempted a Salesforce pivot — this is proof that AI-based controls work at scale. Expand ML-driven anomaly detection (Isolation Forest models on access logs, graph-based lateral movement detection) across all cloud platforms. Monitor for: sudden spike in data read volume from service accounts, off-hours API calls, access to tables outside the connector's historical pattern.
+    </div>
+    <div class="rec-item">
+      <div class="rec-title">Subscribe to Threat Intelligence Feeds</div>
+      ShinyHunters' TTPs are well-documented. Operationalize threat intelligence (STIX/TAXII feeds, ISAC membership) to proactively identify when connected vendors appear in extortion campaigns — before the attacker announces it publicly.
+    </div>
+
+    <h3>Zero Trust Architecture</h3>
+    <div class="rec-item">
+      <div class="rec-title">Adopt Zero Trust for All SaaS Integrations</div>
+      Never trust, always verify — even "internal" service connections. Every SaaS integration must authenticate per-request, be subject to continuous authorization evaluation, and operate on time-limited, scope-limited credentials. Implement a Cloud Access Security Broker (CASB) to enforce policy on all third-party SaaS access to cloud data stores.
+    </div>
+  </section>
+
+  <!-- 9. KEY LESSONS -->
+  <section>
+    <div class="section-header">
+      <span class="section-num">09</span>
+      <h2>Key Lessons for Organizations</h2>
+    </div>
+
+    <div class="lesson-item">
+      <div class="lesson-num">01</div>
+      <div>
+        <strong>Your attack surface is the sum of your vendors' attack surfaces.</strong>
+        <p style="font-size:13px; margin-top:4px; margin-bottom:0;">The Anodot → Snowflake → Rockstar chain demonstrates that your security posture is only as strong as the weakest SaaS platform you've granted access to production data. Map every integration. Classify every token. Monitor every vendor.</p>
+      </div>
+    </div>
+
+    <div class="lesson-item">
+      <div class="lesson-num">02</div>
+      <div>
+        <strong>Valid credentials ≠ legitimate access. Behavioral monitoring is non-negotiable.</strong>
+        <p style="font-size:13px; margin-top:4px; margin-bottom:0;">The breach was "functionally invisible" because it used valid tokens. MFA and strong passwords don't stop token theft. Behavioral anomaly detection — what is this account doing, when, from where, and how much — is the only control that can catch this class of attack.</p>
+      </div>
+    </div>
+
+    <div class="lesson-item">
+      <div class="lesson-num">03</div>
+      <div>
+        <strong>One breach should be a forcing function for systemic change. Two means governance failed.</strong>
+        <p style="font-size:13px; margin-top:4px; margin-bottom:0;">Rockstar's 2022 breach (Lapsus$) should have triggered a root-cause-driven security transformation. The recurrence in 2026 indicates either the lessons weren't implemented or weren't sustained. Post-incident remediation must be measurable and audited.</p>
+      </div>
+    </div>
+
+    <div class="lesson-item">
+      <div class="lesson-num">04</div>
+      <div>
+        <strong>Least privilege is not a checkbox. It requires continuous re-validation.</strong>
+        <p style="font-size:13px; margin-top:4px; margin-bottom:0;">Permission scope set at onboarding drifts over time and is rarely re-evaluated. Quarterly access reviews for every third-party integration must be a hard compliance requirement, not a best-effort aspiration.</p>
+      </div>
+    </div>
+
+    <div class="lesson-item">
+      <div class="lesson-num">05</div>
+      <div>
+        <strong>AI detection works — but only if deployed.</strong>
+        <p style="font-size:13px; margin-top:4px; margin-bottom:0;">ShinyHunters confirmed they were blocked by AI-based detection when they attempted the Salesforce pivot. That same capability, applied to Snowflake access, could have detected the Rockstar exfiltration before public disclosure. AI-powered SIEM and UEBA are no longer optional for enterprise cloud environments.</p>
+      </div>
+    </div>
+
+    <div class="lesson-item">
+      <div class="lesson-num">06</div>
+      <div>
+        <strong>Ransom non-payment is the right call — but the data gets leaked anyway.</strong>
+        <p style="font-size:13px; margin-top:4px; margin-bottom:0;">Rockstar declined to pay. ShinyHunters leaked the data. This is the consistent ShinyHunters playbook. Prevention and detection must be the primary defense — post-exfiltration, the damage calculus is already set. Maintain cyber insurance with extortion coverage and rehearse your breach communication plan before the call comes.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-block">
+    <h3>🔐 Call to Action</h3>
+    <p>If your organization uses any SaaS integration platform with access to cloud data warehouses (Snowflake, BigQuery, Redshift), do this today: <strong>audit every active integration token, verify its permission scope, enforce rotation, and validate network-layer controls.</strong> The Anodot breach affected dozens of companies — the only difference between exposure and containment was whether least-privilege and behavioral monitoring were in place.</p>
+    <p style="margin-top:12px; font-size:12px; color:var(--text-muted);">GRC is not a compliance exercise. It is operational risk management executed in real time.</p>
+  </div>
+
+  <footer>
+    <span>GRC INCIDENT INTELLIGENCE — ROCKSTAR GAMES / SHINYHUNTERS / ANODOT</span>
+    <span>APRIL 14, 2026 | TLP: WHITE</span>
+  </footer>
+
+</div>
+</body>
+</html>
